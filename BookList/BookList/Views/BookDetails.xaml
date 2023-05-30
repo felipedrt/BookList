@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:BookList.ViewModels"
+             xmlns:converters="clr-namespace:BookList.Converters"
+             Title="Book List - Details"
+             x:Class="BookList.Views.BookDetails">
+    <ContentPage.Resources>
+        <converters:ArrayToStringConverter x:Key="arrayToString"></converters:ArrayToStringConverter>
+    </ContentPage.Resources>
+    <ContentPage.BindingContext>
+        <viewmodels:BookDetailsViewModel></viewmodels:BookDetailsViewModel>
+    </ContentPage.BindingContext>
+    <ContentPage.Content>
+        <StackLayout Orientation="Vertical" Margin="10" Padding="10">
+            <StackLayout Orientation="Horizontal">
+                <Label Text="Title: " FontSize="16" FontAttributes="Bold" />
+                <Label Text="{Binding SelectedBook.volumeInfo.title}" FontSize="16"></Label>
+            </StackLayout>
+            <StackLayout Orientation="Vertical">
+                <Label Text="Author(s): " FontSize="16" FontAttributes="Bold" />
+                <Label Text="{Binding SelectedBook.volumeInfo.authors, Converter={StaticResource arrayToString}}" FontSize="16" />
+            </StackLayout>
+            <StackLayout Orientation="Vertical">
+                <Label Text="Description: " FontSize="16" FontAttributes="Bold" />
+                <ScrollView>
+                    <Label Text="{Binding SelectedBook.volumeInfo.description}" FontSize="16"></Label>
+                </ScrollView>
+            </StackLayout>
+            <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                <Button
+                    Text="{Binding FavoriteButtonText}"
+                    Command="{Binding FavoriteOrUnfavoriteBook}"
+                    Background="#2196F3"
+                    HorizontalOptions="FillAndExpand"
+                    TextColor="White">
+                </Button>
+                <Button
+                    Text="Buy"
+                    Command="{Binding BuyCommand}"
+                    IsVisible="{Binding BuyButtonEnabled}"
+                    Background="#2196F3"
+                    HorizontalOptions="FillAndExpand"
+                    TextColor="White">
+                </Button>
+            </StackLayout>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

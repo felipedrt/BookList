@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:BookList.Converters"
+             xmlns:viewmodels="clr-namespace:BookList.ViewModels"
+             Title="BookList"
+             x:Class="BookList.Views.MainPage">
+    <ContentPage.Resources>
+        <converters:ArrayToStringConverter x:Key="arrayToString"></converters:ArrayToStringConverter>
+    </ContentPage.Resources>
+    <ContentPage.BindingContext>
+        <viewmodels:BooksViewModel></viewmodels:BooksViewModel>
+    </ContentPage.BindingContext>
+
+    <ContentPage.Content>
+        <StackLayout>
+            <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                <Button
+                    Text="All Books"
+                    HorizontalOptions="FillAndExpand"
+                    Command="{Binding FilterAllBooks}"
+                    BackgroundColor="{Binding AllBooksButtonBackground}"
+                    TextColor="{Binding AllBooksButtonTextColor}">
+                </Button>
+                <Button
+                    Text="Favorite Books"
+                    HorizontalOptions="FillAndExpand"
+                    Command="{Binding FilterFavoriteBooks}"
+                    BackgroundColor="{Binding FilterFavoriteBooksButtonBackground}"
+                    TextColor="{Binding FilterFavoriteBooksButtonTextColor}">
+                </Button>
+            </StackLayout>
+            <ScrollView Scrolled="ScrollView_Scrolled">
+                <Grid>
+                    <CollectionView ItemsSource="{Binding Books}"
+                                    SelectionMode="Single"
+                                    SelectionChanged="CollectionView_SelectionChanged"
+                                    SelectedItem="{Binding SelectedBook}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <StackLayout Orientation="Horizontal" Padding="10">
+                                    <Image Source="{Binding volumeInfo.imageLinks.smallThumbnail}" WidthRequest="50" HeightRequest="50" />
+                                    <StackLayout Orientation="Vertical">
+                                        <StackLayout Orientation="Horizontal">
+                                            <Label Text="Title: " FontSize="16" FontAttributes="Bold" />
+                                            <Label Text="{Binding volumeInfo.title}" FontSize="16"/>
+                                        </StackLayout>
+                                        <StackLayout Orientation="Horizontal">
+                                            <Label Text="Authors: " FontSize="16" FontAttributes="Bold" />
+                                            <Label Text="{Binding volumeInfo.authors, Converter={StaticResource arrayToString}}" FontSize="16" />
+                                        </StackLayout>
+                                    </StackLayout>
+                                </StackLayout>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                    <ActivityIndicator
+                        IsRunning="{Binding IsLoading}"
+                        Color="#2196F3"
+                        HeightRequest="30"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center"
+                        WidthRequest="30"/>
+                </Grid>
+            </ScrollView>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

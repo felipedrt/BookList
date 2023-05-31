@@ -1,15 +1,12 @@
 ﻿using BookList.Models;
 using BookList.Services;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
-using System.Threading.Tasks;
-using System.ComponentModel;
 using Xamarin.Forms;
 using System.Windows.Input;
 using Xamarin.Essentials;
 using System.Linq;
+using BookList.Utils;
 
 namespace BookList.ViewModels
 {
@@ -23,7 +20,7 @@ namespace BookList.ViewModels
         IBooksService _rest = DependencyService.Get<IBooksService>();
 
         #region Private Attributes
-        
+
         private ObservableCollection<Book> books;
         private bool isLoading;
         private ICommand filterAllBooks;
@@ -34,6 +31,9 @@ namespace BookList.ViewModels
         private string filterFavoriteBooksButtonBackground;
         private string filterFavoriteBooksButtonTextColor;
         private Book selectedBook;
+
+        private int remainingItemsThreshold = 5;
+        private ICommand remainingItemsThresholdReachedCommand;
 
         #endregion
 
@@ -54,9 +54,9 @@ namespace BookList.ViewModels
 
         public bool IsLoading
         {
-            get 
-            { 
-                return isLoading; 
+            get
+            {
+                return isLoading;
             }
             set
             {
@@ -94,9 +94,9 @@ namespace BookList.ViewModels
 
         public string AllBooksButtonTextColor
         {
-            get 
-            { 
-                return allBooksButtonTextColor; 
+            get
+            {
+                return allBooksButtonTextColor;
             }
             set
             {
@@ -107,8 +107,8 @@ namespace BookList.ViewModels
 
         public ICommand FilterFavoriteBooks
         {
-            get 
-            { 
+            get
+            {
                 return filterFavoriteBooks;
             }
             set
@@ -117,7 +117,7 @@ namespace BookList.ViewModels
                 OnPropertyChanged("FilterFavoriteBooks");
             }
         }
-        
+
         public string FilterFavoriteBooksButtonBackground
         {
             get
@@ -158,6 +158,32 @@ namespace BookList.ViewModels
             }
         }
 
+        public int RemainingItemsThreshold
+        {
+            get
+            {
+                return remainingItemsThreshold;
+            }
+            set
+            {
+                remainingItemsThreshold = value;
+                OnPropertyChanged("RemainingItemsThreshold");
+            }
+        }
+
+        public ICommand RemainingItemsThresholdReachedCommand
+        {
+            get
+            {
+                return remainingItemsThresholdReachedCommand;
+            }
+            set
+            {
+                remainingItemsThresholdReachedCommand = value;
+                OnPropertyChanged("RemainingItemsThresholdReachedCommand");
+            }
+        }
+
         #endregion
 
         #region Constructor
@@ -166,6 +192,7 @@ namespace BookList.ViewModels
         {
             FilterAllBooks = new Command(FilterAllBooks_OnClick);
             FilterFavoriteBooks = new Command(FilterFavoriteBooks_OnClick);
+            RemainingItemsThresholdReachedCommand = new Command(LoadMoreItems);
 
             GetBooks();
         }
@@ -173,13 +200,13 @@ namespace BookList.ViewModels
         #endregion
 
         #region Methods
-        
+
         public async void GetBooks()
         {
             try
             {
                 IsLoading = true;
-                var result = await _rest.getBooks();
+                var result = await _rest.getBooks(Constants.MaxResult, 0);
                 if (result != null)
                 {
                     Books = result;
@@ -191,7 +218,7 @@ namespace BookList.ViewModels
                 throw ex;
             }
         }
-     
+
         private void FilterAllBooks_OnClick()
         {
             AllBooksButtonBackground = "#2196F3";
@@ -214,6 +241,21 @@ namespace BookList.ViewModels
             var filteredBooks = Books.Where((book) => Preferences.Get(book.id, false)).ToList<Book>();
             Books = new ObservableCollection<Book>(filteredBooks);
             IsLoading = false;
+        }
+
+        private async void LoadMoreItems()
+        {
+            var result = await _rest.getBooks(Constants.MaxResult, Constants.StartIndex);
+            if (result != null)
+            {
+                Constants.StartIndex += 1;
+                foreach (Book item in result)
+                {
+                    Book book = Books.FirstOrDefault((b) => b.id == item.id);
+                    if (book == null)
+                        Books.Add(item);
+                }
+            }
         }
 
         #endregion

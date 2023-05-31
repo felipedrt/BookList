@@ -9,6 +9,6 @@ namespace BookList.Services
 {
     public interface IBooksService
     {
-        Task<ObservableCollection<Book>> getBooks(int maxResult = 20, int startIndex = 0);
+        Task<ObservableCollection<Book>> getBooks(int maxResult, int startIndex);
     }
 }

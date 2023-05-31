@@ -1,4 +1,5 @@
 ﻿using BookList.Models;
+using BookList.Utils;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -12,16 +13,15 @@ namespace BookList.Services
 {
     public class BooksService : IBooksService
     {
-        public async Task<ObservableCollection<Book>> getBooks(int maxResult = 10, int startIndex = 1)
+        public async Task<ObservableCollection<Book>> getBooks(int maxResult, int startIndex)
         {
             using (var client = new HttpClient())
             {
                 try
                 {
-                    var uri = "https://www.googleapis.com/books/v1/volumes?q=ios&maxResults=" + maxResult + "&startIndex=" + startIndex + "";
+                    var url = Constants.ApiUrl + "&maxResults=" + maxResult + "&startIndex=" + startIndex + "";
 
-
-                    HttpResponseMessage response = await client.GetAsync(uri);
+                    HttpResponseMessage response = await client.GetAsync(url);
                     var result = await response.Content.ReadAsStringAsync();
 
                     var books = JsonConvert.DeserializeObject<Books>(result);

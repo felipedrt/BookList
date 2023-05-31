@@ -30,11 +30,13 @@
                     TextColor="{Binding FilterFavoriteBooksButtonTextColor}">
                 </Button>
             </StackLayout>
-            <ScrollView Scrolled="ScrollView_Scrolled">
+            <ScrollView>
                 <Grid>
                     <CollectionView ItemsSource="{Binding Books}"
                                     SelectionMode="Single"
                                     SelectionChanged="CollectionView_SelectionChanged"
+                                    RemainingItemsThreshold="{Binding RemainingItemsThreshold}"
+                                    RemainingItemsThresholdReachedCommand="{Binding RemainingItemsThresholdReachedCommand}"
                                     SelectedItem="{Binding SelectedBook}">
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
